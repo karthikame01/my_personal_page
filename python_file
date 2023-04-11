@@ -1,0 +1,80 @@
+import datetime
+import os
+
+import pandas as pd
+from numpy.random import randint
+
+import csv
+
+import pandas as pd
+
+mypath2 = 'C:\Program Files (x86)'
+
+headerlist1 = ['Name', 'size', 'time', 'path']
+
+path = mypath2
+dir1 = os.listdir(path)
+extlist = []
+namelist=[]
+pathlist=[]
+ctimelist=[]
+sizelist=[]
+dupsizelist = []
+
+
+for path, subdirs, files in os.walk(mypath2):
+    for name in files:
+
+        #get file name
+        fname1 = os.path.join(name)
+
+        pa=path + "\\" + fname1
+        file_stat = os.stat(pa)
+        fz = file_stat.st_size
+
+        fext = (os.path.splitext(name)[1])[1:]
+        # print(os.path.join(path, name, fext))
+
+        c_time = os.path.getctime(path + "\\" + fname1)
+        # convert creation timestamp into DateTime object
+        dt_c = datetime.datetime.fromtimestamp(c_time)
+       # print(fz)
+
+        namelist.append(fname1)
+        extlist.append(fext)
+        sizelist.append(str(fz))
+        ctimelist.append(str(dt_c))
+        pathlist.append(str(pa))
+
+
+df = pd.DataFrame({ 'name': namelist,
+                   'extension': extlist,
+                   'size': sizelist,
+                   'time': ctimelist,
+                    'path': pathlist})
+
+#df['row_num'] = df.reset_index().index
+
+df = pd.DataFrame(list(zip(extlist, sizelist, ctimelist, pathlist)),  index=namelist)
+
+df.columns =['extension', 'size', 'time', 'path']
+
+
+#print(df)
+
+duplicate = df[df.duplicated('size')]
+
+print("Duplicate Rows based on size :")
+
+# Print the resultant Dataframe
+print(duplicate)
+df.to_csv('C:\Users\Suganya\Pictures\Saved Pictures\university_records.csv')
+
+
+f=duplicate.loc[:, ["path"]].values
+
+for items in f:
+    u=items
+    print(u)
+    #os.remove(str(items))
+
